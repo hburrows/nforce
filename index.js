@@ -545,6 +545,8 @@ Connection.prototype.apexRest = function(data, callback) {
 
 // streaming methods
 
+var _clientCache = {};
+
 Connection.prototype.stream = function(data) {
   var that = this;
   var opts = this._getOpts(data);
@@ -552,10 +554,19 @@ Connection.prototype.stream = function(data) {
 
   var str = new FDCStream();
 
-  endpoint = opts.oauth.instance_url + '/cometd/' + that.apiVersion.substring(1);
+  if (opts.oauth.access_token in _clientCache) {
+    console.log('Reusing faye client for: ' + opts.oauth.access_token);
+    client = _clientCache[opts.oauth.access_token];
+  }
+  else {
+    endpoint = opts.oauth.instance_url + '/cometd/' + that.apiVersion.substring(1);
 
-  client = new faye.Client(endpoint, {});
-  client.setHeader('Authorization', 'OAuth ' + opts.oauth.access_token);
+    client = new faye.Client(endpoint, {});
+    client.setHeader('Authorization', 'OAuth ' + opts.oauth.access_token);
+
+    console.log('Creating new faye client for: ' + opts.oauth.access_token);
+    _clientCache[opts.oauth.access_token] = client;
+  }
 
   sub = client.subscribe('/topic/' + opts.topic, function(d){
     str.write(d);
