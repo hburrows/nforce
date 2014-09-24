@@ -555,7 +555,7 @@ Connection.prototype.stream = function(data) {
   var str = new FDCStream();
 
   if (opts.oauth.access_token in _clientCache) {
-    console.log('Reusing faye client for: ' + opts.oauth.access_token);
+    //console.log('Reusing faye client for: ' + opts.oauth.access_token);
     client = _clientCache[opts.oauth.access_token];
   }
   else {
@@ -564,7 +564,7 @@ Connection.prototype.stream = function(data) {
     client = new faye.Client(endpoint, {});
     client.setHeader('Authorization', 'OAuth ' + opts.oauth.access_token);
 
-    console.log('Creating new faye client for: ' + opts.oauth.access_token);
+    //console.log('Creating new faye client for: ' + opts.oauth.access_token);
     _clientCache[opts.oauth.access_token] = client;
   }
 
